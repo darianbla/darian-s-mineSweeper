@@ -1,0 +1,53 @@
+* {
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body {
+    background-color: black;
+    color: white;
+    text-align: center;
+
+}
+
+
+.board {
+    text-align: center;
+}
+
+.cell {
+    border-radius: 12%;
+    cursor: pointer;
+    /* cursor:not-allowed; */
+    width: 80px;
+    height: 80px;
+    /* text-align: center; */
+    border: solid 5px rgb(113, 99, 110);
+    
+    background-color: aqua;
+    color: rgb(103, 73, 37);
+    opacity: 0.7;
+    transition: 0.4s;
+}
+
+.mine {
+    display: none;
+}
+
+.cell:hover {
+    opacity: 1;
+    border: solid 3px rgb(214, 190, 209);
+    /* transition: 0.4s; */
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(203, 114, 201);
+    color: white;
+    text-align: center;
+    border:solid 2px whitesmoke ;
+}
