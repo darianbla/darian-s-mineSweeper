@@ -1,5 +1,6 @@
 "use strict";
 const MINE = "💣";
+const FLAG = "🚩";
 var gBoard;
 
 //runs the game

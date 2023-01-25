@@ -103,8 +103,7 @@ function renderBoard(board) {
     for (var j = 0; j < board[0].length; j++) {
       var currCell = board[i][j];
 
-      var cellClass = `cell cell-${i}-${j}`;
-
+      var cellClass = `cell-cell${i}-${j}`;
       strHTML += `\t<td class="cell ${cellClass}" onclick="onCellClicked(this,${i},${j})"`;
       strHTML += "\t</td>\n";
     }
@@ -121,6 +120,40 @@ function onCellClicked(cell, i, j) {
       cell.innerText += `${currCell.minesAroundCount}`;
     currCell.isShown = true;
   }
+}
+
+window.oncontextmenu = (e) => {
+  e.preventDefault();
+  var currcell = document.querySelector(".cell:hover");
+  // var cellI = 
+  for (var i = 0; i < gBoard.length; i++) {
+    for (var j = 0; j < gBoard.length; j++) {
+
+    }
+  }
+  currcell.innerText = FLAG;
+  console.log("right clicked");
+};
+function hundleRightClick(cell) {}
+function handleKey(e, cell, i, j) {}
+
+function hundleRightClick(cell, i, j) {
+  //   document.oncontextmenu = rightClick;
+  //   function rightClick(e) {
+  //     e.preventDefault();
+  //     // var currCell = gBoard[i][j];
+  //     // if (!currCell.isShown) {
+  //     //   if (!currCell.isMarked) {
+  //     //     cell.innerText = FLAG;
+  //     //     currCell.isMarked = true;
+  //     //   } else {
+  //     //     cell.innerText -= FLAG;
+  //     //     currCell.isMarked = false;
+  //     //   }
+  //     // }
+  //     if (document.getElementById("contextMenu").style.display == "block")
+  //       hideMenu();
+  //   }
 }
 
 function renderCell(location, value) {
