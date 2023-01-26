@@ -12,9 +12,27 @@
     onload="initGame()"
     oncontextmenu="return false;"
   >
+    <button class="btn start-over" onclick="changeLevel(4)">
+      Restart game
+    </button>
+    <br />
+    <button class="btn btn-ez btn-dark" onclick="changeDifficulty('Easy')">
+      Easy
+    </button>
+    <button class="btn btn-md btn-dark" onclick="changeDifficulty('Medium')">
+      Medium
+    </button>
+    <button class="btn btn-ex btn-dark" onclick="changeDifficulty('Expert')">
+      Expert
+    </button>
     <table>
       <tbody class="board"></tbody>
     </table>
+
+    <div class="modal">
+      <h3 class="user-msg">i</h3>
+      <button class="btn restart-btn" onclick="initGame()">Restart</button>
+    </div>
 
     <div class="footer">
       <p>Created with love by Darian Vega-Garcia</p>

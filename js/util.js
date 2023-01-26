@@ -1,3 +1,5 @@
+"use strict";
+
 //check neg
 function setMinesNegsCount(cellI, cellJ, mat) {
   var mineCount = 0;
@@ -36,18 +38,18 @@ function buildBoard(size, minesnum) {
       };
 
       //random way to implant mines
-      // for (var k = 0; k < mines.length; k++) {
-      //   var currMine = mines[k];
+      for (var k = 0; k < mines.length; k++) {
+        var currMine = mines[k];
 
-      //   if (!rows[j].isMine) {
-      //     rows[j].isMine = implantMines(currMine, i, j);
-      //   }
-      // }
+        if (!rows[j].isMine) {
+          rows[j].isMine = implantMines(currMine, i, j);
+        }
+      }
 
       //static way to implant mines
-      if ((i === 1 && j === 1) || (i === 2 && j === 2)) {
-        rows[j].isMine = true;
-      }
+      // if ((i === 1 && j === 1) || (i === 2 && j === 2)) {
+      //   rows[j].isMine = true;
+      // }
     }
     board.push(rows);
   }
@@ -103,7 +105,13 @@ function renderBoard(board) {
     for (var j = 0; j < board[0].length; j++) {
       var currCell = board[i][j];
 
-      var cellClass = `cell-cell${i}-${j}`;
+      var cellClass = `cell-${i}-${j}`;
+      if (currCell.isMine) cellClass += " mine";
+      if (!currCell.isMine && currCell.minesAroundCount !== 0)
+        cellClass += " num";
+      if (!currCell.isMine && currCell.minesAroundCount === 0)
+        cellClass += " empty";
+      var elCell = document.querySelector(`.cell-${i}-${j}`);
       strHTML += `\t<td class="cell ${cellClass}" onclick="onCellClicked(this,${i},${j})"`;
       strHTML += "\t</td>\n";
     }
@@ -113,30 +121,55 @@ function renderBoard(board) {
 }
 
 function onCellClicked(cell, i, j) {
+  reverseRenderCell(gBoard);
   var currCell = gBoard[i][j];
-  if (!currCell.isShown) {
-    if (currCell.isMine) cell.innerText += MINE;
-    else if (currCell.minesAroundCount !== 0)
-      cell.innerText += `${currCell.minesAroundCount}`;
-    currCell.isShown = true;
-  }
-}
-
-window.oncontextmenu = (e) => {
-  e.preventDefault();
-  var currcell = document.querySelector(".cell:hover");
-  // var cellI = 
-  for (var i = 0; i < gBoard.length; i++) {
-    for (var j = 0; j < gBoard.length; j++) {
-
+  var elAllMines = document.querySelectorAll(".mine");
+  // console.log("currCell:", currCell);
+  // console.log("mines:", elAllMines);
+  if (!currCell.isMarked) {
+    if (!currCell.isShown) {
+      if (currCell.isMine) {
+        for (var elMine of elAllMines) {
+          console.log("elmine:", elMine);
+          elMine.innerText = MINE;
+          currCell.isShown = true;
+          elMine.classList.add("shown");
+          gameOver();
+        }
+      } else if (currCell.minesAroundCount !== 0) {
+        cell.innerText += `${currCell.minesAroundCount}`;
+        currCell.isShown = true;
+        cell.classList.add("shown");
+      } else if (currCell.minesAroundCount === 0) {
+        currCell.isShown = true;
+        cell.classList.add("shown");
+      }
     }
   }
-  currcell.innerText = FLAG;
-  console.log("right clicked");
-};
-function hundleRightClick(cell) {}
-function handleKey(e, cell, i, j) {}
+  checkIsVictory();
+}
 
+// cant find a place to warp this as a function...
+window.oncontextmenu = (e) => {
+  e.preventDefault();
+  var countAction = 1;
+  var elCell = document.querySelector(".cell:hover");
+
+  if (elCell.innerText === FLAG && countAction > 0) {
+    elCell.innerText = "";
+    elCell.classList.remove("marked");
+    countAction = 0;
+  }
+  if (elCell.innerText === "" && countAction > 0) {
+    elCell.innerText = FLAG;
+    elCell.classList.add("marked");
+    countAction = 0;
+  }
+  reverseRenderCell(gBoard);
+  checkIsVictory();
+};
+
+//NOT DOING ANYTHING
 function hundleRightClick(cell, i, j) {
   //   document.oncontextmenu = rightClick;
   //   function rightClick(e) {
@@ -154,6 +187,34 @@ function hundleRightClick(cell, i, j) {
   //     if (document.getElementById("contextMenu").style.display == "block")
   //       hideMenu();
   //   }
+}
+
+function reverseRenderCell(board) {
+  var locationI;
+  var locationJ;
+  for (var i = 0; i < board.length; i++) {
+    for (var j = 0; j < board[i].length; j++) {
+      var currCell = board[i][j];
+      locationI = currCell.location.i;
+      locationJ = currCell.location.j;
+      var elCell = document.querySelector(`.cell-${locationI}-${locationJ}`);
+      //check marked
+      if (elCell.classList.contains("marked")) {
+        currCell.isMarked = true;
+        // console.log("currCell:", currCell);
+      } else {
+        currCell.isMarked = false;
+      }
+      //check num
+      if (currCell.minesAroundCount !== 0 && !currCell.isMine) {
+        elCell.classList.add("num");
+      }
+      //check empty
+      if (currCell.minesAroundCount === 0 && !currCell.isMine) {
+        elCell.classList.add("empty");
+      }
+    }
+  }
 }
 
 function renderCell(location, value) {
@@ -177,4 +238,63 @@ function removeDuplicates(nums) {
     }
   }
   return nums;
+}
+
+function checkIsVictory() {
+  var elAllMines = document.querySelectorAll(".mine");
+  var elAllNums = document.querySelectorAll(".num");
+  var elAllEmpty = document.querySelectorAll(".empty");
+
+  //lose condition
+  // console.log("elAllMines:", elAllMines);
+  for (var i = 0; i < elAllMines.length; i++) {
+    if (elAllMines[i].classList.contains("shown"))
+      return gameOver(gGame.isVictory);
+  }
+  // win conidition
+  // if all mines are marked return true and all other cells are showen
+  for (var i = 0; i < elAllMines.length; i++) {
+    if (!elAllMines[i].classList.contains("marked")) return;
+  }
+  var numsCellsShown = [];
+  for (var i = 0; i < elAllNums.length; i++) {
+    if (!elAllNums[i].classList.contains("shown")) return;
+    if (elAllNums[i].classList.contains("shown"))
+      numsCellsShown.push(elAllNums[i]);
+  }
+  var emptyCellsShonw = [];
+  for (var i = 0; i < elAllEmpty.length; i++) {
+    if (!elAllEmpty[i].classList.contains("shown")) return;
+    if (elAllEmpty[i].classList.contains("shown"))
+      emptyCellsShonw.push(elAllEmpty[i]);
+  }
+  console.log(
+    "numsCellsShown=elAllNums?",
+    numsCellsShown.length,
+    elAllNums.length
+  );
+  if (
+    numsCellsShown.length === elAllNums.length &&
+    emptyCellsShonw.length === elAllEmpty.length
+  ) {
+    gGame.isVictory = true;
+    return gameOver(gGame.isVictory);
+  }
+}
+
+function gameOver() {
+  var elModal = document.querySelector(".modal");
+  var elModalMsg = document.querySelector(".user-msg");
+  var msg = "";
+  gGame.isVictory ? "You win!" : "GAME-OVER";
+  if (gGame.isVictory) {
+    msg = "You win!";
+    elModalMsg.innerText = msg;
+    elModalMsg.style.color = "rgb(29, 220, 137)";
+  } else {
+    msg = "GAME-OVER";
+    elModalMsg.innerText = msg;
+  }
+  elModal.style.display = "block";
+  console.log("gameover");
 }
