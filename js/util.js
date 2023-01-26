@@ -19,6 +19,8 @@ function setMinesNegsCount(cellI, cellJ, board) {
 }
 //check neg for recursion
 function setEmptyNegsCount(cellI, cellJ, board) {
+  var elClickedCell = document.querySelector(`.cell-${cellI}-${cellJ}`);
+  var clickedCell = board[cellI][cellJ];
   // looping through 8 cells of specified cell
   for (var i = cellI - 1; i <= cellI + 1; i++) {
     // wont count beyond border(undefined)
@@ -39,9 +41,24 @@ function setEmptyNegsCount(cellI, cellJ, board) {
         }
 
         if (currCell.minesAroundCount === 0) {
-          console.log("click!");
-          elCell.classList.add("shown");
-           onCellClicked(elCell, i, j);
+          if (gIsFirstClick) {
+            currCell.isMine = true;
+            elCell.classList.remove("empty");
+            elCell.classList.add("mine");
+            elClickedCell.classList.remove("empty");
+            clickedCell.minesAroundCount = setMinesNegsCount(
+              cellI,
+              cellJ,
+              board
+            );
+            gIsFirstClick = false;
+            gBoard = buildBoard(gLevel.size, gLevel.mines);
+            return;
+          } else {
+            console.log("click!");
+            elCell.classList.add("shown");
+            onCellClicked(elCell, i, j);
+          }
         }
       }
     }
@@ -68,11 +85,13 @@ function buildBoard(size, minesnum) {
       };
 
       //random way to implant mines
-      for (var k = 0; k < mines.length; k++) {
-        var currMine = mines[k];
+      if (!gIsFirstClick) {
+        for (var k = 0; k < mines.length; k++) {
+          var currMine = mines[k];
 
-        if (!rows[j].isMine) {
-          rows[j].isMine = implantMines(currMine, i, j);
+          if (!rows[j].isMine) {
+            rows[j].isMine = implantMines(currMine, i, j);
+          }
         }
       }
 
@@ -83,7 +102,6 @@ function buildBoard(size, minesnum) {
     }
     board.push(rows);
   }
-
   for (var i = 0; i < size; i++) {
     for (var j = 0; j < size; j++) {
       var currCell = board[i][j];
@@ -92,13 +110,21 @@ function buildBoard(size, minesnum) {
         currCell.location.j,
         board
       );
-      if (currCell.isMine) {
-        currCell = MINE;
-      }
     }
   }
   return board;
+  // return implantNums(board);
 }
+
+// function implantNums(board) {
+//   var size = gLevel.size;
+
+//       // renderCell(
+//       //   currCell.location.i,
+//       //   currCell.location.j,
+//       //   currCell.minesAroundCount
+//       // );
+//     }
 
 function implantMines(mines, i, j) {
   var res = false;
@@ -167,18 +193,20 @@ function onCellClicked(cell, i, j) {
     }
     if (!currCell.isMine) {
       if (currCell.minesAroundCount !== 0) {
-        cell.innerText += `${currCell.minesAroundCount}`;
+        cell.innerText = `${currCell.minesAroundCount}`;
         cell.classList.add("shown");
         currCell.isShown = true;
       }
       if (currCell.minesAroundCount === 0) {
         currCell.isShown = true;
         cell.classList.add("shown");
-         setEmptyNegsCount(i, j, gBoard);
+        setEmptyNegsCount(i, j, gBoard);
       }
     }
   }
-  checkIsVictory();
+  if (!gIsFirstClick) {
+    checkIsVictory();
+  }
 }
 
 // cant find a place to warp this as a function...
@@ -249,11 +277,10 @@ function reverseRenderCell(board) {
   }
 }
 
-function renderCell(location, value) {
+function renderCell(i, j, value) {
   // Select the elCell and set the value
-  const elCell = document.querySelector(`.cell-${location.i}-${location.j}`);
-  elCell.innerHTML = value;
-  return elCell;
+  const elCell = document.querySelector(`.cell-${i}-${j}`);
+  elCell.innerText = `${value}`;
 }
 
 function getRandomInt(min, max) {
@@ -318,12 +345,13 @@ function gameOver() {
   var elModal = document.querySelector(".modal");
   var elModalMsg = document.querySelector(".user-msg");
   var msg = "";
-  gGame.isVictory ? "You win!" : "GAME-OVER";
   if (gGame.isVictory) {
+    startButton.innerText = HAPPY;
     msg = "You win!";
     elModalMsg.innerText = msg;
     elModalMsg.style.color = "rgb(29, 220, 137)";
   } else {
+    startButton.innerText = SAD;
     msg = "GAME-OVER";
     elModalMsg.innerText = msg;
   }

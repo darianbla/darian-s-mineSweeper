@@ -1,9 +1,11 @@
 "use strict";
 const MINE = "💣";
 const FLAG = "🚩";
-const RESTART = "😄";
+const NORMAL = "😄";
+const HAPPY = "😎";
+const SAD = "🤯";
+var gIsFirstClick = false;
 var startButton = document.querySelector(".start-over");
-startButton.innerText = RESTART;
 var difficulty = "Easy";
 var gLevel = {
   mines: 2,
@@ -19,6 +21,8 @@ var gBoard;
 
 //runs the game
 function initGame() {
+  gIsFirstClick = false;
+  startButton.innerText = NORMAL;
   switch (difficulty) {
     case "Easy":
       gLevel.mines = 2;
