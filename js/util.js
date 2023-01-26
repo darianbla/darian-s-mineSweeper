@@ -1,21 +1,51 @@
 "use strict";
 
 //check neg
-function setMinesNegsCount(cellI, cellJ, mat) {
+function setMinesNegsCount(cellI, cellJ, board) {
   var mineCount = 0;
   // looping through 8 cells of specified cell
   for (var i = cellI - 1; i <= cellI + 1; i++) {
     // wont count beyond border(undefined)
-    if (i < 0 || i >= mat.length) continue;
+    if (i < 0 || i >= board.length) continue;
     for (var j = cellJ - 1; j <= cellJ + 1; j++) {
       //wont count chosen cell
       if (i === cellI && j === cellJ) continue;
-      if (j < 0 || j >= mat[i].length) continue;
+      if (j < 0 || j >= board[i].length) continue;
 
-      if (mat[i][j].isMine) mineCount++;
+      if (board[i][j].isMine) mineCount++;
     }
   }
   return mineCount;
+}
+//check neg for recursion
+function setEmptyNegsCount(cellI, cellJ, board) {
+  // looping through 8 cells of specified cell
+  for (var i = cellI - 1; i <= cellI + 1; i++) {
+    // wont count beyond border(undefined)
+    if (i < 0 || i >= board.length) continue;
+    for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+      //wont count chosen cell
+      if (i === cellI && j === cellJ) continue;
+      if (j < 0 || j >= board[i].length) continue;
+      var currCell = board[i][j];
+      var elCell = document.querySelector(`.cell-${i}-${j}`);
+
+      if (!currCell.isShown && !currCell.isMine) {
+        if (currCell.minesAroundCount !== 0) {
+          currCell.isShown = true;
+          console.log("num click!");
+          elCell.classList.add("shown");
+          onCellClicked(elCell, i, j);
+        }
+
+        if (currCell.minesAroundCount === 0) {
+          console.log("click!");
+          elCell.classList.add("shown");
+           onCellClicked(elCell, i, j);
+        }
+      }
+    }
+  }
 }
 
 function buildBoard(size, minesnum) {
@@ -111,7 +141,6 @@ function renderBoard(board) {
         cellClass += " num";
       if (!currCell.isMine && currCell.minesAroundCount === 0)
         cellClass += " empty";
-      var elCell = document.querySelector(`.cell-${i}-${j}`);
       strHTML += `\t<td class="cell ${cellClass}" onclick="onCellClicked(this,${i},${j})"`;
       strHTML += "\t</td>\n";
     }
@@ -127,22 +156,25 @@ function onCellClicked(cell, i, j) {
   // console.log("currCell:", currCell);
   // console.log("mines:", elAllMines);
   if (!currCell.isMarked) {
-    if (!currCell.isShown) {
-      if (currCell.isMine) {
-        for (var elMine of elAllMines) {
-          console.log("elmine:", elMine);
-          elMine.innerText = MINE;
-          currCell.isShown = true;
-          elMine.classList.add("shown");
-          gameOver();
-        }
-      } else if (currCell.minesAroundCount !== 0) {
+    if (!currCell.isShown && currCell.isMine) {
+      for (var elMine of elAllMines) {
+        // console.log("elmine:", elMine);
+        elMine.innerText = MINE;
+        currCell.isShown = true;
+        elMine.classList.add("shown");
+        gameOver();
+      }
+    }
+    if (!currCell.isMine) {
+      if (currCell.minesAroundCount !== 0) {
         cell.innerText += `${currCell.minesAroundCount}`;
+        cell.classList.add("shown");
+        currCell.isShown = true;
+      }
+      if (currCell.minesAroundCount === 0) {
         currCell.isShown = true;
         cell.classList.add("shown");
-      } else if (currCell.minesAroundCount === 0) {
-        currCell.isShown = true;
-        cell.classList.add("shown");
+         setEmptyNegsCount(i, j, gBoard);
       }
     }
   }
