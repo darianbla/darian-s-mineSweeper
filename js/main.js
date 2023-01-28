@@ -4,13 +4,14 @@ const FLAG = "🚩";
 const NORMAL = "😄";
 const HAPPY = "😎";
 const SAD = "🤯";
-var gIsFirstClick = false;
+var gIsFirstClick = true;
 var startButton = document.querySelector(".start-over");
 var difficulty = "Easy";
 var gLevel = {
   mines: 2,
   size: 4,
 };
+var gFlagsLeft = gLevel.mines
 const gGame = {
   isVictory: false,
   isGameOn: false,
@@ -21,7 +22,8 @@ var gBoard;
 
 //runs the game
 function initGame() {
-  gIsFirstClick = false;
+  
+  gIsFirstClick = true;
   startButton.innerText = NORMAL;
   switch (difficulty) {
     case "Easy":
@@ -41,15 +43,24 @@ function initGame() {
   gGame.isVictory = false;
   gGame.flagedMines = 0;
   gBoard = buildBoard(gLevel.size, gLevel.mines);
+  console.table(gBoard);
+  gBoard = buildBoard(gLevel.size, gLevel.mines);
   renderBoard(gBoard);
   console.table(gBoard);
 
   var elModal = document.querySelector(".modal");
   elModal.style.display = "none";
+  gFlagsLeft = gLevel.mines
+  hundleFlagsLeft();
 }
 
 function changeDifficulty(str) {
   difficulty = str;
   console.log(difficulty);
   initGame();
+}
+
+function hundleFlagsLeft() {
+  var elFlagsLeft = document.querySelector("h2 span");
+  elFlagsLeft.innerText = gFlagsLeft;
 }

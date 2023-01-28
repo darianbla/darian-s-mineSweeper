@@ -12,19 +12,23 @@
     onload="initGame()"
     oncontextmenu="return false;"
   >
+    <h2>🚩left: <span>0</span></h2>
     <button class="start-over" onclick="window.location.reload()">
       Restart game
     </button>
     <br />
-    <button class="btn btn-ez btn-dark" onclick="changeDifficulty('Easy')">
-      Easy
-    </button>
-    <button class="btn btn-md btn-dark" onclick="changeDifficulty('Medium')">
-      Medium
-    </button>
-    <button class="btn btn-ex btn-dark" onclick="changeDifficulty('Expert')">
-      Expert
-    </button>
+    <nav>
+      <button href="#" class="btn btn-ez btn-dark" onclick="changeDifficulty('Easy')">
+        Easy
+      </button>
+      <button href="#" class="btn btn-md btn-dark" onclick="changeDifficulty('Medium')">
+        Medium
+      </button>
+      <button href="#" class="btn btn-ex btn-dark" onclick="changeDifficulty('Expert')">
+        Expert
+      </button>
+      <div class="animation start-Easy"></div>
+    </nav>
     <table>
       <tbody class="board"></tbody>
     </table>
